@@ -235,7 +235,7 @@ class OpenAIAgent(conversation.AbstractConversationAgent):
 
     """Fetch system prompt from external API based on device_id."""
     async def fetch_system_prompt(self, device_id: str) -> str:
-        url = f"http://localhost:8080/getPrompt?device_id={device_id}"  # Replace with your API URL
+        url = f"http://localhost:8080/api/getPrompt/?device_id={device_id}"  # Replace with your API URL
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as response:
                 if response.status == 200:
