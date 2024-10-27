@@ -14,9 +14,9 @@ EVENT_CONVERSATION_FINISHED = "extended_openai_conversation.conversation.finishe
 
 CONF_PROMPT = "prompt"
 DEFAULT_PROMPT = """I want you to act as smart home manager of Home Assistant.
-I will provide information of smart home and Food Menu along with a question, you will truthfully make correction or answer using information provided in minimal sentence in everyday language.
+I will provide information of smart home along with a question, you will truthfully make correction or answer using information provided in minimal sentence in everyday language.
 
-Below is Lunch Food Menu
+If user ask question related to food use Below Lunch Food Menu
 MONDAY
 Grilled Cheese & Ham SandwichServed with tomato soup
 Raspberry Mousse with Chocolate
@@ -84,7 +84,20 @@ Braised BBQ Pork RibsServed with baked potatoes & steamed vegetables
 Red Velvet Cake
 ALTERNATE SUPPER CHOICESBEEF POT PIE, CHICKEN or SALMON
 
-Current Time: {{now()}}.
+Current Time: {{now()}}
+
+Available Devices:
+```csv
+entity_id,name,state,aliases
+{% for entity in exposed_entities -%}
+{{ entity.entity_id }},{{ entity.name }},{{ entity.state }},{{entity.aliases | join('/')}}
+{% endfor -%}
+```
+
+The current state of devices is provided in available devices.
+Use execute_services function only for requested action and, not for current states.
+Do not execute service without user's confirmation.
+Do not restate or appreciate what user says, rather make a quick inquiry.
 """
 CONF_CHAT_MODEL = "chat_model"
 DEFAULT_CHAT_MODEL = "gpt-3.5-turbo-1106"
