@@ -97,22 +97,6 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up OpenAI Conversation from a config entry."""
 
-     # Fetch the dynamic prompt from an external API or source
-    try:
-        async with ClientSession() as session:
-            async with session.get("https://ihywn15b65.execute-api.us-east-1.amazonaws.com/dev/api/getPrompt/?device_id=68-3E-26-3E-C5-E3") as response:
-                if response.status == 200:
-                    prompt_data = await response.json()
-                    dynamic_prompt = prompt_data.get("prompt", DEFAULT_PROMPT)
-                else:
-                    dynamic_prompt = DEFAULT_PROMPT  # Fallback prompt
-    except Exception as err:
-        _LOGGER.error("Failed to fetch prompt: %s", err)
-        dynamic_prompt = DEFAULT_PROMPT
-
-    # Temporarily set the fetched prompt to entry options
-    entry.options = {**entry.options, CONF_PROMPT: dynamic_prompt}
-
     try:
         await validate_authentication(
             hass=hass,
@@ -250,9 +234,26 @@ class OpenAIAgent(conversation.AbstractConversationAgent):
             response=intent_response, conversation_id=conversation_id
         )
 
-    def _generate_system_message(
+    async def _generate_system_message(
         self, exposed_entities, user_input: conversation.ConversationInput
     ):
+         # Fetch the dynamic prompt from an external API or source
+        device_id = user_input.device_id
+        try:
+            async with ClientSession() as session:
+                async with session.get("https://ihywn15b65.execute-api.us-east-1.amazonaws.com/dev/api/getPrompt/?device_id={device_id}") as response:
+                    if response.status == 200:
+                        prompt_data = await response.json()
+                        dynamic_prompt = prompt_data.get("prompt", DEFAULT_PROMPT)
+                    else:
+                        dynamic_prompt = DEFAULT_PROMPT  # Fallback prompt
+        except Exception as err:
+            _LOGGER.error("Failed to fetch prompt: %s", err)
+            dynamic_prompt = DEFAULT_PROMPT
+
+        # Temporarily set the fetched prompt to entry options
+        entry.options = {**entry.options, CONF_PROMPT: dynamic_prompt}            
+
         raw_prompt = self.entry.options.get(CONF_PROMPT, DEFAULT_PROMPT)
         prompt = self._async_generate_prompt(raw_prompt, exposed_entities, user_input)
         return {"role": "system", "content": prompt}
