@@ -84,20 +84,7 @@ Braised BBQ Pork RibsServed with baked potatoes & steamed vegetables
 Red Velvet Cake
 ALTERNATE SUPPER CHOICESBEEF POT PIE, CHICKEN or SALMON
 
-Current Time: {{now()}}
-
-Available Devices:
-```csv
-entity_id,name,state,aliases
-{% for entity in exposed_entities -%}
-{{ entity.entity_id }},{{ entity.name }},{{ entity.state }},{{entity.aliases | join('/')}}
-{% endfor -%}
-```
-
-The current state of devices is provided in available devices.
-Use execute_services function only for requested action, not for current states.
-Do not execute service without user's confirmation.
-Do not restate or appreciate what user says, rather make a quick inquiry.
+Current Time: {{now()}}.
 """
 CONF_CHAT_MODEL = "chat_model"
 DEFAULT_CHAT_MODEL = "gpt-3.5-turbo-1106"
