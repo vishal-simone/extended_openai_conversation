@@ -1,8 +1,8 @@
+"""The OpenAI Conversation integration."""
 from __future__ import annotations
 
 import json
 import logging
-import requests  # Added to handle external API calls
 from typing import Literal
 
 from openai import AsyncAzureOpenAI, AsyncOpenAI
@@ -82,13 +82,20 @@ _LOGGER = logging.getLogger(__name__)
 
 CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
 
+
+# hass.data key for agent.
 DATA_AGENT = "agent"
 
+
 async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
+    """Set up OpenAI Conversation."""
     await async_setup_services(hass, config)
     return True
 
+
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+    """Set up OpenAI Conversation from a config entry."""
+
     try:
         await validate_authentication(
             hass=hass,
@@ -115,13 +122,19 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     conversation.async_set_agent(hass, entry, agent)
     return True
 
+
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+    """Unload OpenAI."""
     hass.data[DOMAIN].pop(entry.entry_id)
     conversation.async_unset_agent(hass, entry)
     return True
 
+
 class OpenAIAgent(conversation.AbstractConversationAgent):
+    """OpenAI conversation agent."""
+
     def __init__(self, hass: HomeAssistant, entry: ConfigEntry) -> None:
+        """Initialize the agent."""
         self.hass = hass
         self.entry = entry
         self.history: dict[str, list[dict]] = {}
@@ -142,6 +155,7 @@ class OpenAIAgent(conversation.AbstractConversationAgent):
 
     @property
     def supported_languages(self) -> list[str] | Literal["*"]:
+        """Return a list of supported languages."""
         return MATCH_ALL
 
     async def async_process(
@@ -156,7 +170,7 @@ class OpenAIAgent(conversation.AbstractConversationAgent):
             conversation_id = ulid.ulid()
             user_input.conversation_id = conversation_id
             try:
-                system_message = await self._generate_system_message(
+                system_message = self._generate_system_message(
                     exposed_entities, user_input
                 )
             except TemplateError as err:
@@ -219,37 +233,12 @@ class OpenAIAgent(conversation.AbstractConversationAgent):
             response=intent_response, conversation_id=conversation_id
         )
 
-    async def _generate_system_message(
+    def _generate_system_message(
         self, exposed_entities, user_input: conversation.ConversationInput
     ):
-        raw_prompt = await self.fetch_dynamic_prompt(user_input.device_id)
+        raw_prompt = self.entry.options.get(CONF_PROMPT, DEFAULT_PROMPT)
         prompt = self._async_generate_prompt(raw_prompt, exposed_entities, user_input)
         return {"role": "system", "content": prompt}
-
-    def _async_generate_prompt(
-        self,
-        raw_prompt: str,
-        exposed_entities,
-        user_input: conversation.ConversationInput,
-    ) -> str:
-        return template.Template(raw_prompt, self.hass).async_render(
-            {
-                "ha_name": self.hass.config.location_name,
-                "exposed_entities": exposed_entities,
-                "current_device_id": user_input.device_id,
-            },
-            parse_result=False,
-        )
-
-    async def fetch_dynamic_prompt(self, device_id: str) -> str:
-        try:
-            response = requests.get(f"http://localhost:8080/api/getPrompt?device_id={device_id}")
-            response.raise_for_status()
-            prompt_data = response.json()
-            return prompt_data.get("system_prompt", DEFAULT_PROMPT)
-        except requests.exceptions.RequestException as e:
-            _LOGGER.error("Failed to fetch prompt from API: %s", e)
-            return DEFAULT_PROMPT
 
     def _async_generate_prompt(
         self,
