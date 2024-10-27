@@ -1,5 +1,6 @@
 """The OpenAI Conversation integration."""
 from __future__ import annotations
+from aiohttp import ClientSession  # Import for async HTTP requests
 
 import json
 import logging
