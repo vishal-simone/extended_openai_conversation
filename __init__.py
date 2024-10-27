@@ -1,6 +1,5 @@
 """The OpenAI Conversation integration."""
 from __future__ import annotations
-from aiohttp import ClientSession  # Import for async HTTP requests
 
 import json
 import logging
@@ -238,10 +237,9 @@ class OpenAIAgent(conversation.AbstractConversationAgent):
         self, exposed_entities, user_input: conversation.ConversationInput
     ):
          # Fetch the dynamic prompt from an external API or source
-        device_id = user_input.device_id
         try:
             async with ClientSession() as session:
-                async with session.get("https://ihywn15b65.execute-api.us-east-1.amazonaws.com/dev/api/getPrompt/?device_id={device_id}") as response:
+                async with session.get("https://ihywn15b65.execute-api.us-east-1.amazonaws.com/dev/api/getPrompt/?device_id=68-3E-26-3E-C5-E3") as response:
                     if response.status == 200:
                         prompt_data = await response.json()
                         dynamic_prompt = prompt_data.get("prompt", DEFAULT_PROMPT)
@@ -252,7 +250,7 @@ class OpenAIAgent(conversation.AbstractConversationAgent):
             dynamic_prompt = DEFAULT_PROMPT
 
         # Temporarily set the fetched prompt to entry options
-        entry.options = {**entry.options, CONF_PROMPT: dynamic_prompt}            
+        self.entry.options = {**self.entry.options, CONF_PROMPT: dynamic_prompt}            
 
         raw_prompt = self.entry.options.get(CONF_PROMPT, DEFAULT_PROMPT)
         prompt = self._async_generate_prompt(raw_prompt, exposed_entities, user_input)
