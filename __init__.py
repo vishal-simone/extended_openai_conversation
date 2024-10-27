@@ -1,6 +1,6 @@
 """The OpenAI Conversation integration."""
 from __future__ import annotations
-import aiohttp
+
 import json
 import logging
 from typing import Literal
@@ -233,25 +233,10 @@ class OpenAIAgent(conversation.AbstractConversationAgent):
             response=intent_response, conversation_id=conversation_id
         )
 
-    """Fetch system prompt from external API based on device_id."""
-    async def fetch_system_prompt(self, device_id: str) -> str:
-        url = f"http://localhost:8080/api/getPrompt/?device_id={device_id}"  # Replace with your API URL
-        async with aiohttp.ClientSession() as session:
-            async with session.get(url) as response:
-                if response.status == 200:
-                    data = await response.json()
-                    return data.get("prompt", DEFAULT_PROMPT)  # Provide a fallback prompt if needed
-                else:
-                    _LOGGER.error("Failed to fetch system prompt: %s", response.status)
-                    return "Error retrieving system prompt"
-
-    async def _generate_system_message(
+    def _generate_system_message(
         self, exposed_entities, user_input: conversation.ConversationInput
     ):
-        device_id = user_input.device_id
-        raw_prompt = await self.fetch_system_prompt(device_id)  # Fetch prompt using device_id
-
-        # raw_prompt = self.entry.options.get(CONF_PROMPT, DEFAULT_PROMPT)
+        raw_prompt = self.entry.options.get(CONF_PROMPT, DEFAULT_PROMPT)
         prompt = self._async_generate_prompt(raw_prompt, exposed_entities, user_input)
         return {"role": "system", "content": prompt}
 
