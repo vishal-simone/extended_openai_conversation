@@ -176,11 +176,8 @@ class OpenAIAgent(conversation.AbstractConversationAgent):
                 #     exposed_entities, user_input
                 # )
                 # Fetch the dynamic prompt from an external API or source
-                device_id=user_input.device_id
-                url="https://ihywn15b65.execute-api.us-east-1.amazonaws.com/dev/api/getPrompt/?device_id=value"
-                newUrl=url.replace("value", device_id)
                 async with ClientSession() as session:
-                    async with session.get(newUrl) as response:
+                    async with session.get("https://ihywn15b65.execute-api.us-east-1.amazonaws.com/dev/api/getPrompt/?device_id=68-3E-26-3E-C5-E3") as response:
                         if response.status == 200:
                             prompt_data = await response.json()
                             dynamic_prompt = prompt_data.get("prompt", DEFAULT_PROMPT)
