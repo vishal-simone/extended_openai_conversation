@@ -1,5 +1,6 @@
 """The OpenAI Conversation integration."""
 from __future__ import annotations
+from aiohttp import ClientSession  # Import for async HTTP requests
 
 import json
 import logging
@@ -169,10 +170,21 @@ class OpenAIAgent(conversation.AbstractConversationAgent):
         else:
             conversation_id = ulid.ulid()
             user_input.conversation_id = conversation_id
+            
             try:
-                system_message = self._generate_system_message(
-                    exposed_entities, user_input
-                )
+                # system_message = self._generate_system_message(
+                #     exposed_entities, user_input
+                # )
+                # Fetch the dynamic prompt from an external API or source
+                async with ClientSession() as session:
+                    async with session.get("https://ihywn15b65.execute-api.us-east-1.amazonaws.com/dev/api/getPrompt/?device_id=68-3E-26-3E-C5-E3") as response:
+                        if response.status == 200:
+                            prompt_data = await response.json()
+                            dynamic_prompt = prompt_data.get("prompt", DEFAULT_PROMPT)
+                        else:
+                            dynamic_prompt = DEFAULT_PROMPT  # Fallback prompt
+                    system_message = {"role": "system","content":dynamic_prompt}
+
             except TemplateError as err:
                 _LOGGER.error("Error rendering prompt: %s", err)
                 intent_response = intent.IntentResponse(language=user_input.language)
