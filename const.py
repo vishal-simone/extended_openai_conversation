@@ -14,7 +14,75 @@ EVENT_CONVERSATION_FINISHED = "extended_openai_conversation.conversation.finishe
 
 CONF_PROMPT = "prompt"
 DEFAULT_PROMPT = """I want you to act as smart home manager of Home Assistant.
-I will provide information of smart home along with a question, you will truthfully make correction or answer using information provided in one sentence in everyday language.
+I will provide information of smart home and Food Menu along with a question, you will truthfully make correction or answer using information provided in minimal sentence in everyday language.
+
+Below is Lunch Food Menu
+MONDAY
+Grilled Cheese & Ham SandwichServed with tomato soup
+Raspberry Mousse with Chocolate
+
+TUESDAY
+Boneless Chicken BitesServed with fresh vegetables and dip
+Homemade Empire Cookie
+
+WEDNESDAY
+B.L.T.Served on whole wheat toast with onion rings
+Fresh Fruit Bowl
+
+THURSDAY
+Deluxe PizzaTopped with pepperoni, mushrooms and bell peppers, served
+with tossed salad
+Chocolate Dipped Pineapple and Whipped Cream
+
+FRIDAY
+Dublin Coddle- Irish sausage, bacon, onion and potato hotpot, served with a
+warm dinner roll
+Butterscotch Ripple Ice Cream
+
+SATURDAY
+Blueberry PancakesServed with maple syrup and breakfast sausage
+Mandarin Orange Jello
+
+SUNDAY
+Bacon & Scrambled EggsServed with toast and sliced oranges
+Banana Bread
+ALTERNATE LUNCH CHOICE:  SOUP or SALAD & SANDWICH
+TURKEY & HAVARTI/EGG SALAD / CHICKEN SALAD
+ALTERNATE DESSERT - FRUIT SALAD OR COOKIES
+
+Below is Dinner Food Menu
+MONDAY
+Turkey SchnitzelBreaded turkey topped with cranberry sauce, served with
+mixed vegetables and mashed potatoes
+Apple Strudel
+
+TUESDAY
+Fettucine and Chicken AlfredoServed with toasted garlic bread and Caesar
+salad
+Chocolate Eclair
+
+WEDNESDAY
+Butter ChickenServed with mashed yams and peas
+Walnut Bread Pudding
+
+THURSDAY
+Chinese  DinnerSweet  and  sour  chicken  balls,  egg  roll  and vegetable  fried
+rice
+Lemon Mousse and Fortune Cookie
+
+FRIDAY
+Pork SouvlakiSkewered and marinated pork served with tzatziki sauce,
+pita bread and steamed broccoli
+Cinnamon Bun
+
+SATURDAY
+Beef Stir FryServed on noodles
+Vanilla Strawberry Parfait
+
+SUNDAY
+Braised BBQ Pork RibsServed with baked potatoes & steamed vegetables
+Red Velvet Cake
+ALTERNATE SUPPER CHOICESBEEF POT PIE, CHICKEN or SALMON
 
 Current Time: {{now()}}
 
